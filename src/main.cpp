@@ -29,6 +29,8 @@ Camera camera;
 Scene scene;
 FpsCounter fps;
 
+bool accum = false;
+
 /* GLUT */
 int WIDTH = 640;
 int HEIGHT = 480;
@@ -38,7 +40,8 @@ int mouse_mode = 0;
 int mouse_x, mouse_y;
 void displayFunc(){
 
-	Mat frame = renderer.renderFrame(WIDTH, HEIGHT, camera, scene);
+	Mat frame = renderer.renderFrame(WIDTH, HEIGHT, camera, scene, accum);
+	accum = true;
 
 	flip(frame, frame, 0);
 // 	cvtColor(frame, frame, CV_GRAY2BGRA);
@@ -75,16 +78,40 @@ void motionFunc(int x, int y){
 	mouse_x = x; mouse_y = y;
 
 	switch(mouse_mode){
-		case 1: camera.rotateOrbit(0.005f*dClickX,0.005f*dClickY); break;
+		case 1:
+			camera.rotateOrbit(0.005f*dClickX,0.005f*dClickY);
+			break;
 	}
+	accum = false;
 }
 
 int main(int argc, char * argv[]){
 	/* Add objects */
-	scene.addObject(new Rectangle(Point3f(0,-1,0), Point3f(10,0,0), Point3f(0,0,10), Scalar(255,255,255)));
-	scene.addObject(new Sphere(Point3f(2,0,0), 1, Scalar(0,255,0)));
-	scene.addObject(new Sphere(Point3f(-2,0,0), 1, Scalar(0,0,255)));
-	scene.addLight(new Light(Point3f(0,10,0), Scalar(255,255,255)));
+	const float BOX_SIZE = 8.0f;
+	scene.addObject(new Rectangle(Point3f(0, BOX_SIZE/2,0), Point3f(BOX_SIZE,0,0), Point3f(0,0,BOX_SIZE), Scalar(255,255,255)));
+	scene.addObject(new Rectangle(Point3f(0,-BOX_SIZE/2,0), Point3f(BOX_SIZE,0,0), Point3f(0,0,BOX_SIZE), Scalar(255,255,255)));
+
+// 	scene.addObject(new Rectangle(Point3f(0,0,BOX_SIZE/2), Point3f(0,BOX_SIZE,0), Point3f(BOX_SIZE,0,0), Scalar(255,255,255)));
+	scene.addObject(new Rectangle(Point3f(0,0,-BOX_SIZE/2), Point3f(0,BOX_SIZE,0), Point3f(BOX_SIZE,0,0), Scalar(255,255,255)));
+
+	scene.addObject(new Rectangle(Point3f(BOX_SIZE/2,0,0), Point3f(0,BOX_SIZE,0), Point3f(0,0,BOX_SIZE), Scalar(0,0,255)));
+	scene.addObject(new Rectangle(Point3f(-BOX_SIZE/2,0,0), Point3f(0,BOX_SIZE,0), Point3f(0,0,BOX_SIZE), Scalar(0,255,0)));
+
+	scene.addObject(new Sphere(Point3f(-1,-BOX_SIZE/2+1,0), 1, Scalar(0,0,255)));
+	scene.addObject(new Sphere(Point3f(1,-BOX_SIZE/2+1,1), 1, Scalar(0,255,0)));
+	scene.addObject(new Sphere(Point3f(1,-BOX_SIZE/2+1,-1), 1, Scalar(255,255,255)));
+
+	scene.addLight(new Light(Point3f(0.0,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+	scene.addLight(new Light(Point3f(0.1,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+	scene.addLight(new Light(Point3f(0.2,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+// 	scene.addLight(new Light(Point3f(0.3,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+// 	scene.addLight(new Light(Point3f(0.4,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+// 	scene.addLight(new Light(Point3f(0.5,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+// 	scene.addLight(new Light(Point3f(0.6,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+// 	scene.addLight(new Light(Point3f(0.7,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+// 	scene.addLight(new Light(Point3f(0.8,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+// 	scene.addLight(new Light(Point3f(0.9,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+// 	scene.addLight(new Light(Point3f(1.0,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
 
 	/* GLUT */
 	glutInit(&argc, argv);

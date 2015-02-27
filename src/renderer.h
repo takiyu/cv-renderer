@@ -5,17 +5,25 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <omp.h>
 
+#include <cstdio>//for rand
+
+#include "math_util.h"
+#include "ray.h"
 #include "scene.h"
 #include "camera.h"
+#include "unit_pixel.h"
 
 class Renderer {
 public:
-	static cv::Scalar BG_COLOR; // background color
+	const cv::Scalar BG_COLOR; // background color
 
 	Renderer();
-	cv::Mat renderFrame(const int WIDTH, const int HEIGHT, Camera& camera, Scene& scene);
+	cv::Mat renderFrame(const int WIDTH, const int HEIGHT, Camera& camera, Scene& scene, bool accum = false);
 private:
-	cv::Scalar render(const cv::Point3f& look_org, const cv::Point3f& look_dir, Scene& scene);
+	UnitPixel unit_pixel;
+
+	cv::Scalar render(Ray& ray, Scene& scene, int depth_count = 1);
 };
+
 
 #endif

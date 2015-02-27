@@ -5,6 +5,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "math_util.h"
+#include "ray.h"
 
 // enum MaterialType {
 // 	MATERIAL_TYPE_NORMAL, // 完全拡散面
@@ -12,20 +13,15 @@
 // 	MATERIAL_TYPE_GLASS,  // ガラス的物質
 // };
 
-struct IntersectInfo {
-	cv::Point3f position; // hit position
-	cv::Point3f normal;
-	float distance;
-// 	cv::Point3f vertical_vec;// vertical vector to the ray
-};
-
 /* Base Object Class */
 class Object {
 public:
+	const static float NEAR_ZERO = 0.0001;
+
 	Object();
 	Object(cv::Point3f position, cv::Scalar color);
 	cv::Scalar getColor(){ return color; }
-	virtual bool intersect(const cv::Point3f& ray_org, const cv::Point3f& ray_dir, IntersectInfo& dst) = 0;
+	virtual bool intersect(const cv::Point3f& ray_org, const cv::Point3f& ray_dir, Intersection& dst) = 0;
 	cv::Scalar sample(const cv::Point3f& light_dir, const cv::Point3f& look_dir, const cv::Point3f& normal);
 protected:
 	cv::Point3f position;
@@ -40,7 +36,7 @@ class Sphere : public Object {
 public:
 	Sphere();
 	Sphere(cv::Point3f position, float radius, cv::Scalar color);
-	virtual bool intersect(const cv::Point3f& ray_org, const cv::Point3f& ray_dir, IntersectInfo& dst);
+	virtual bool intersect(const cv::Point3f& ray_org, const cv::Point3f& ray_dir, Intersection& dst);
 protected:
 	float radius;
 };
@@ -50,19 +46,23 @@ class Rectangle : public Object {
 public:
 	Rectangle();
 	Rectangle(cv::Point3f position, cv::Point3f x_vec, cv::Point3f y_vec, cv::Scalar color);
-	virtual bool intersect(const cv::Point3f& ray_org, const cv::Point3f& ray_dir, IntersectInfo& dst);
+	virtual bool intersect(const cv::Point3f& ray_org, const cv::Point3f& ray_dir, Intersection& dst);
 protected:
 	cv::Point3f x_basis, y_basis;
 	float x_norm, y_norm;
+	cv::Point3f normal;
 };
 
 
 /* Light */
 class Light {
 public:
+	const static double EMISSION_SCALE = 1.0 / 255.0; 
 	Light();
 	Light(cv::Point3f position, cv::Scalar emission);
-	cv::Point3f getPosition(){ return position; }
+	cv::Point3f getDir(const cv::Point3f& org){ return normalize(position - org); }
+	float getDistance(const cv::Point3f& org){ return norm(position - org); }
+	cv::Scalar getEmissionRate(){ return emission; }
 protected:
 	cv::Point3f position;
 	cv::Scalar emission;

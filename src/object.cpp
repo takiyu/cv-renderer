@@ -22,7 +22,7 @@ cv::Scalar Object::sample(const Point3f& light_dir, const Point3f& look_dir, con
 	if(Ld > 0.0f && visible){
 		L += Ld*Kd;
 
-		Point3f r = reflect(light_dir, normal);
+		Point3f r = reflect(-light_dir, normal);
 		float Ls = Ks * pow(-look_dir.dot(r), glossiness);//ls
 		if(Ls > 0){
 			L += Ls;
@@ -36,7 +36,7 @@ Sphere::Sphere(){
 Sphere::Sphere(Point3f position, float radius, Scalar color) : Object(position, color){
 	this->radius = radius;
 }
-bool Sphere::intersect(const Point3f& ray_org, const Point3f& ray_dir, IntersectInfo& dst){
+bool Sphere::intersect(const Point3f& ray_org, const Point3f& ray_dir, Intersection& dst){
 	Point3f rel_pos = this->position - ray_org;
 
 // 	float a = ray_dir.dot(ray_dir); // a = 1
@@ -50,11 +50,12 @@ bool Sphere::intersect(const Point3f& ray_org, const Point3f& ray_dir, Intersect
 
 // 	float t1 = (b2_neg - sqrt(D_4))/ a;
 // 	float t2 = (b2_neg + sqrt(D_4))/ a;
-	float t1 = (b2_neg - sqrt(D_4));
-	float t2 = (b2_neg + sqrt(D_4));
+	float sqrt_D_4 = sqrt(D_4);
+	float t1 = (b2_neg - sqrt_D_4);
+	float t2 = (b2_neg + sqrt_D_4);
 
-	if(t1 < 0.0f && t2 < 0.0f) return false;
-	if(t1 > 0.0f) dst.distance = t1;
+	if(t1 < NEAR_ZERO && t2 < NEAR_ZERO) return false;
+	if(t1 > NEAR_ZERO) dst.distance = t1;
 	else          dst.distance = t2;
 
 	dst.position = dst.distance*ray_dir + ray_org;
@@ -81,13 +82,14 @@ Rectangle::Rectangle(cv::Point3f position, cv::Point3f x_vec, cv::Point3f y_vec,
 	this->y_basis = normalize(y_vec);
 	this->x_norm = norm(x_vec);
 	this->y_norm = norm(y_vec);
+	this->normal = normalize(this->x_basis.cross(this->y_basis));
 }
-bool Rectangle::intersect(const Point3f& ray_org, const Point3f& ray_dir, IntersectInfo& dst){
+bool Rectangle::intersect(const Point3f& ray_org, const Point3f& ray_dir, Intersection& dst){
 	Point3f rel_pos = this->position - ray_org;
 
-	dst.normal = normalize(this->x_basis.cross(this->y_basis));
+	dst.normal = this->normal;
 	dst.distance = (rel_pos.dot(dst.normal) / ray_dir.dot(dst.normal));
-	if(dst.distance <= 0.0f) return false;
+	if(dst.distance <= NEAR_ZERO) return false;
 
 	dst.position = dst.distance*ray_dir + ray_org;
 
@@ -104,5 +106,5 @@ bool Rectangle::intersect(const Point3f& ray_org, const Point3f& ray_dir, Inters
 
 Light::Light(){
 }
-Light::Light(Point3f position, Scalar emission) : position(position), emission(emission){
+Light::Light(Point3f position, Scalar emission) : position(position), emission(emission * EMISSION_SCALE){
 }
