@@ -63,16 +63,6 @@ bool Sphere::intersect(const Point3f& ray_org, const Point3f& ray_dir, Intersect
 	dst.normal = normalize(dst.position - this->position);
 
 	return true;
-
-// 	Point3f dir_dist = ray_dir.dot(rel_pos) * ray_dir;
-//
-// 	dst.vertical_vec = dir_dist - rel_pos;
-// 	if(norm(dst.vertical_vec) > radius){//miss
-// 		dst.position = ray_org + dir_dist;
-// 		dst.normal = dir_dist - rel_pos;
-// 		dst.distance = norm(dir_dist);
-// 		return false;
-// 	}
 }
 
 Rectangle::Rectangle(){
@@ -106,5 +96,5 @@ bool Rectangle::intersect(const Point3f& ray_org, const Point3f& ray_dir, Inters
 
 Light::Light(){
 }
-Light::Light(Point3f position, Scalar emission) : position(position), emission(emission * EMISSION_SCALE){
+Light::Light(Point3f position, Scalar emission) : position(position), emission(emission){
 }

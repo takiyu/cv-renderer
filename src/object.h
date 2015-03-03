@@ -57,11 +57,9 @@ protected:
 /* Light */
 class Light {
 public:
-	const static double EMISSION_SCALE = 1.0 / 255.0; 
 	Light();
 	Light(cv::Point3f position, cv::Scalar emission);
-	cv::Point3f getDir(const cv::Point3f& org){ return normalize(position - org); }
-	float getDistance(const cv::Point3f& org){ return norm(position - org); }
+	cv::Point3f getPosition(){ return position; }
 	cv::Scalar getEmissionRate(){ return emission; }
 protected:
 	cv::Point3f position;

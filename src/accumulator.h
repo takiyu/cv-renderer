@@ -7,11 +7,11 @@
 
 #include "math_util.h"
 
-class UnitPixel {
+class Accumulator {
 public:
 	const static int MAX_UNIT_NUM = 10;
 
-	UnitPixel();
+	Accumulator();
 	void setScreenSize(int width, int height);
 	void clear();
 	void update(int x, int y, const cv::Scalar& c, const float weight);

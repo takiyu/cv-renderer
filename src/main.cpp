@@ -44,7 +44,6 @@ void displayFunc(){
 	accum = true;
 
 	flip(frame, frame, 0);
-// 	cvtColor(frame, frame, CV_GRAY2BGRA);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawPixels(WIDTH, HEIGHT, GL_BGRA, GL_UNSIGNED_BYTE, frame.data);
@@ -85,33 +84,39 @@ void motionFunc(int x, int y){
 	accum = false;
 }
 
+void addBox(Point3f pos, Point3f vx, Point3f vy, Point3f vz, Scalar color, Scene& scene){
+	scene.addObject(new Rectangle(pos+vx*0.5, vy, vz, color));
+	scene.addObject(new Rectangle(pos-vx*0.5, vy, vz, color));
+	scene.addObject(new Rectangle(pos+vy*0.5, vx, vz, color));
+	scene.addObject(new Rectangle(pos-vy*0.5, vx, vz, color));
+	scene.addObject(new Rectangle(pos+vz*0.5, vx, vy, color));
+	scene.addObject(new Rectangle(pos-vz*0.5, vx, vy, color));
+}
+
 int main(int argc, char * argv[]){
 	/* Add objects */
-	const float BOX_SIZE = 8.0f;
-	scene.addObject(new Rectangle(Point3f(0, BOX_SIZE/2,0), Point3f(BOX_SIZE,0,0), Point3f(0,0,BOX_SIZE), Scalar(255,255,255)));
-	scene.addObject(new Rectangle(Point3f(0,-BOX_SIZE/2,0), Point3f(BOX_SIZE,0,0), Point3f(0,0,BOX_SIZE), Scalar(255,255,255)));
+	const float B0 = 6.0f;
+	scene.addObject(new Rectangle(Point3f(0, B0/2,0), Point3f(B0,0,0), Point3f(0,0,B0), Scalar(1,1,1)));
+	scene.addObject(new Rectangle(Point3f(0,-B0/2,0), Point3f(B0,0,0), Point3f(0,0,B0), Scalar(1,1,1)));
+// 	scene.addObject(new Rectangle(Point3f(0,0,B0/2), Point3f(0,B0,0), Point3f(B0,0,0), Scalar(1,1,1)));
+	scene.addObject(new Rectangle(Point3f(0,0,-B0/2), Point3f(0,B0,0), Point3f(B0,0,0), Scalar(1,1,1)));
+	scene.addObject(new Rectangle(Point3f(B0/2,0,0), Point3f(0,B0,0), Point3f(0,0,B0), Scalar(0.25,0.25,0.75)));
+	scene.addObject(new Rectangle(Point3f(-B0/2,0,0), Point3f(0,B0,0), Point3f(0,0,B0), Scalar(0.25,0.75,0.25)));
 
-// 	scene.addObject(new Rectangle(Point3f(0,0,BOX_SIZE/2), Point3f(0,BOX_SIZE,0), Point3f(BOX_SIZE,0,0), Scalar(255,255,255)));
-	scene.addObject(new Rectangle(Point3f(0,0,-BOX_SIZE/2), Point3f(0,BOX_SIZE,0), Point3f(BOX_SIZE,0,0), Scalar(255,255,255)));
 
-	scene.addObject(new Rectangle(Point3f(BOX_SIZE/2,0,0), Point3f(0,BOX_SIZE,0), Point3f(0,0,BOX_SIZE), Scalar(0,0,255)));
-	scene.addObject(new Rectangle(Point3f(-BOX_SIZE/2,0,0), Point3f(0,BOX_SIZE,0), Point3f(0,0,BOX_SIZE), Scalar(0,255,0)));
-
-	scene.addObject(new Sphere(Point3f(-1,-BOX_SIZE/2+1,0), 1, Scalar(0,0,255)));
-	scene.addObject(new Sphere(Point3f(1,-BOX_SIZE/2+1,1), 1, Scalar(0,255,0)));
-	scene.addObject(new Sphere(Point3f(1,-BOX_SIZE/2+1,-1), 1, Scalar(255,255,255)));
-
-	scene.addLight(new Light(Point3f(0.0,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
-	scene.addLight(new Light(Point3f(0.1,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
-	scene.addLight(new Light(Point3f(0.2,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
-// 	scene.addLight(new Light(Point3f(0.3,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
-// 	scene.addLight(new Light(Point3f(0.4,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
-// 	scene.addLight(new Light(Point3f(0.5,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
-// 	scene.addLight(new Light(Point3f(0.6,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
-// 	scene.addLight(new Light(Point3f(0.7,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
-// 	scene.addLight(new Light(Point3f(0.8,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
-// 	scene.addLight(new Light(Point3f(0.9,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
-// 	scene.addLight(new Light(Point3f(1.0,BOX_SIZE/2*0.99,0), Scalar(255,255,255)));
+	/* Box */
+	const float B1 = 1.6f;
+	addBox(Point3f(1.1,(-B0+B1*2)*0.5,-1.2), Point3f(B1,0,1.0), Point3f(0,B1*2,0), Point3f(-1.0,0,B1), Scalar(1,1,1), scene);
+	/* Sphere */
+	const float RADIUS = 0.8;
+	scene.addObject(new Sphere(Point3f(-RADIUS, -B0/2+RADIUS,       0), RADIUS, Scalar(1,1,1)));
+	/* Light */
+	const int light_num = 2;
+	for(int i = 0; i < light_num; i++){
+		for(int j = 0; j < light_num; j++){
+			scene.addLight(new Light(Point3f(i*0.05,B0/2*0.99,j*0.05), Scalar(1,1,1)));
+		}
+	}
 
 	/* GLUT */
 	glutInit(&argc, argv);

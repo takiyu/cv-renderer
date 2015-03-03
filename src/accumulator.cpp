@@ -1,12 +1,12 @@
-#include "unit_pixel.h"
+#include "accumulator.h"
 
 using namespace cv;
 using namespace std;
 
-UnitPixel::UnitPixel(){
+Accumulator::Accumulator(){
 	width = height = 0;
 }
-void UnitPixel::setScreenSize(int width, int height){
+void Accumulator::setScreenSize(int width, int height){
 	if(width == this->width && height == this->height) return;
 	this->width = width;
 	this->height = height;
@@ -25,7 +25,7 @@ void UnitPixel::setScreenSize(int width, int height){
 		if(w == 0 || h == 0) break;
 	}
 }
-void UnitPixel::clear(){
+void Accumulator::clear(){
 	for(int i = 0; i < data.size(); i++){
 		for(int j = 0; j < data[i].size(); j++){
 			data[i][j] = Scalar(0,0,0,0); 
@@ -33,7 +33,7 @@ void UnitPixel::clear(){
 		}
 	}
 }
-void UnitPixel::update(int x, int y, const Scalar& c, const float weight){
+void Accumulator::update(int x, int y, const Scalar& c, const float weight){
 	if(weight > 0) {
 		//update pixel maps
 		for(int i = 0; i < data.size(); i++){
@@ -43,7 +43,7 @@ void UnitPixel::update(int x, int y, const Scalar& c, const float weight){
 		}
 	}
 }
-Scalar UnitPixel::get(int x, int y){
+Scalar Accumulator::get(int x, int y){
 	//search least scale effective pixel
 	for(int i = 0; i < data.size(); i++){
 		int idx = (y>>i)*(width>>i)+(x>>i);

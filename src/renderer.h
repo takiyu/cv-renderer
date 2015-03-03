@@ -11,7 +11,7 @@
 #include "ray.h"
 #include "scene.h"
 #include "camera.h"
-#include "unit_pixel.h"
+#include "accumulator.h"
 
 class Renderer {
 public:
@@ -20,7 +20,7 @@ public:
 	Renderer();
 	cv::Mat renderFrame(const int WIDTH, const int HEIGHT, Camera& camera, Scene& scene, bool accum = false);
 private:
-	UnitPixel unit_pixel;
+	Accumulator accumulator;
 
 	cv::Scalar render(Ray& ray, Scene& scene, int depth_count = 1);
 };

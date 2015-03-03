@@ -3,7 +3,7 @@
 using namespace cv;
 using namespace std;
 
-Camera::Camera() : from(0,0,4), to(0,0,0), up(0,1,0), fov(90) {
+Camera::Camera() : from(0,0,3.5), to(0,0,0), up(0,1,0), fov(90) {
 }
 Camera::Camera(const Point3f& from) : from(from), to(0,0,0), up(0,1,0), fov(90) {
 }
